@@ -1,236 +1,276 @@
 import { useState, useEffect } from "react";
 
-/* ─── DATA STATIS ────────────────── */
-const allOrders = [
-  {
-    id: "#RP001",
-    item: "Mystery Bag Bakery",
-    seller: "Roti Enakk",
-    emoji: "🥐",
-    price: "Rp15.000",
-    status: "Diproses",
-    statusColor: "bg-amber-100 text-amber-700",
-    dot: "bg-amber-500",
-    date: "Hari ini",
-    time: "10:32",
-    tab: "aktif",
-  },
-  {
-    id: "#RP002",
-    item: "Nasi Box Surplus",
-    seller: "Warung Hemat",
-    emoji: "🍱",
-    price: "Rp12.000",
-    status: "Siap Diambil",
-    statusColor: "bg-green-100 text-green-700",
-    dot: "bg-green-500",
-    date: "Hari ini",
-    time: "11:05",
-    tab: "aktif",
-  },
-  {
-    id: "#RP003",
-    item: "Paket Roti Mix",
-    seller: "Bakery Fresh",
-    emoji: "🍞",
-    price: "Rp10.000",
-    status: "Selesai",
-    statusColor: "bg-blue-100 text-blue-700",
-    dot: "bg-blue-500",
-    date: "Kemarin",
-    time: "09:20",
-    tab: "selesai",
-  },
-];
-
-const partnerData = [
-  {
-    id: 1,
-    name: "Bakery Fresh",
-    emoji: "🥐",
-    items: 5,
-    sold: 23,
-    revenue: "Rp345.000",
-    rating: 4.8,
-    color: "from-amber-50 to-orange-50",
-    border: "border-amber-200",
-    products: [
-      { name: "Paket Roti Mix", price: "Rp10.000", stock: 8, sold: 14 },
-      { name: "Croissant Sisa", price: "Rp8.000", stock: 4, sold: 6 },
-    ],
-  },
-];
-
-/* ─── KOMPONEN KECIL ────────────────────────────────────── */
-function StatusBadge({ statusColor, dot, status }) {
+/* ─── KOMPONEN: LANDING PAGE (BELUM LOGIN) ──────────────── */
+function LandingPage({ onLoginClick }) {
   return (
-    <span
-      className={`text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5 ${statusColor}`}
-    >
-      <span className={`w-1.5 h-1.5 rounded-full ${dot} inline-block`} />
-      {status}
-    </span>
+    <div className="min-h-screen bg-white">
+      <nav className="flex justify-between items-center px-8 py-6 max-w-7xl mx-auto">
+        <h1 className="text-2xl font-black text-green-600">Re-Plate</h1>
+        <button
+          onClick={onLoginClick}
+          className="bg-green-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-green-700 transition-all"
+        >
+          Masuk / Daftar
+        </button>
+      </nav>
+      <main className="max-w-7xl mx-auto px-8 py-20 flex flex-col md:flex-row items-center gap-12">
+        <div className="flex-1 text-center md:text-left">
+          <span className="bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm font-bold">
+            📍 Malang Food Waste Movement
+          </span>
+          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mt-6 leading-tight">
+            Solusi Makanan Murah untuk{" "}
+            <span className="text-green-600">UMKM Malang.</span>
+          </h2>
+          <p className="text-gray-500 mt-6 text-lg max-w-lg">
+            Bantu restoran mengurangi limbah pangan dan dapatkan bahan baku
+            kualitas resto dengan harga teman.
+          </p>
+          <button
+            onClick={onLoginClick}
+            className="mt-10 bg-gray-900 text-white px-10 py-5 rounded-[2rem] text-xl font-bold shadow-2xl hover:scale-105 transition-all"
+          >
+            Mulai Selamatkan Makanan
+          </button>
+        </div>
+        <div className="flex-1 bg-green-50 rounded-[3rem] p-12 flex items-center justify-center text-[10rem]">
+          🍱
+        </div>
+      </main>
+    </div>
   );
 }
 
-// ─── SECTION: BERANDA ────────────────────────────────────
-function HomeSection({ foods, onOrder, added, loading }) {
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <div className="w-10 h-10 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-gray-500 font-medium">Memuat makanan lezat...</p>
-      </div>
-    );
-  }
+function AuthSection({ onAuthSubmit, onBack }) {
+  const [isRegister, setIsRegister] = useState(false);
+  const [role, setRole] = useState("umkm");
+  // State untuk menampung input sesuai kolom DB
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    shop_name: "",
+  });
 
-  if (!foods || foods.length === 0) {
-    return (
-      <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
-        <p className="text-5xl mb-4">🍽️</p>
-        <h3 className="text-lg font-bold text-gray-800">
-          Belum ada makanan tersedia
-        </h3>
-        <p className="text-gray-500">
-          Cek lagi nanti ya, jangan sampai kehabisan!
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Kirim objek formData lengkap ke handleAuth
+    onAuthSubmit(formData, isRegister, role);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6 py-12">
+      <div className="max-w-md w-full bg-white p-10 rounded-[3rem] shadow-xl border border-gray-100">
+        <button
+          onClick={onBack}
+          className="text-gray-400 mb-6 font-bold hover:text-gray-600"
+        >
+          ← Kembali
+        </button>
+        <h2 className="text-3xl font-black text-gray-900 mb-2">
+          {isRegister ? "Buat Akun" : "Selamat Datang"}
+        </h2>
+
+        {isRegister && (
+          <div className="flex gap-4 my-6">
+            <button
+              type="button"
+              onClick={() => setRole("umkm")}
+              className={`flex-1 py-3 rounded-2xl border-2 font-bold transition-all ${role === "umkm" ? "border-green-600 bg-green-50 text-green-700" : "border-gray-100 text-gray-400"}`}
+            >
+              🍱 UMKM
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("partner")}
+              className={`flex-1 py-3 rounded-2xl border-2 font-bold transition-all ${role === "partner" ? "border-green-600 bg-green-50 text-green-700" : "border-gray-100 text-gray-400"}`}
+            >
+              🤝 Partner
+            </button>
+          </div>
+        )}
+
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          {isRegister && (
+            <>
+              <input
+                type="text"
+                placeholder="Nama Lengkap"
+                className="w-full px-6 py-4 rounded-2xl bg-gray-50 focus:ring-2 focus:ring-green-500 outline-none"
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+              />
+              <input
+                type="text"
+                placeholder="Nama Toko/Warung (Opsional)"
+                className="w-full px-6 py-4 rounded-2xl bg-gray-50 focus:ring-2 focus:ring-green-500 outline-none"
+                onChange={(e) =>
+                  setFormData({ ...formData, shop_name: e.target.value })
+                }
+              />
+            </>
+          )}
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full px-6 py-4 rounded-2xl bg-gray-50 focus:ring-2 focus:ring-green-500 outline-none"
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full px-6 py-4 rounded-2xl bg-gray-50 focus:ring-2 focus:ring-green-500 outline-none"
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
+            required
+          />
+
+          <button
+            type="submit"
+            className="w-full py-5 bg-green-600 text-white rounded-2xl font-black text-lg mt-4 shadow-lg uppercase tracking-wider"
+          >
+            {isRegister ? "Daftar" : "Masuk"}
+          </button>
+        </form>
+
+        <p className="text-center mt-8 text-sm font-bold text-gray-400">
+          {isRegister ? "Sudah punya akun?" : "Belum punya akun?"}
+          <button
+            onClick={() => setIsRegister(!isRegister)}
+            className="text-green-600 ml-2"
+          >
+            {isRegister ? "Masuk" : "Daftar"}
+          </button>
         </p>
       </div>
-    );
-  }
-
-  return (
-    <>
-      <div className="bg-green-600 rounded-2xl p-6 text-white relative overflow-hidden mb-8">
-        <div className="absolute -right-6 -top-6 w-40 h-40 bg-green-500 rounded-full opacity-50" />
-        <div className="relative z-10">
-          <span className="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full mb-3">
-            🌍 Kurangi Food Waste Sekarang
-          </span>
-          <h2 className="text-2xl font-bold mb-1">Hemat hingga 70%</h2>
-          <p className="text-green-100 text-sm mb-4">
-            Makanan enak, harga bersahabat, planet lebih baik.
-          </p>
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-4">
-        {foods.map((food) => (
-          <div
-            key={food.id}
-            className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="h-40 bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center relative">
-              <span className="text-6xl">{food.emoji || "🍱"}</span>
-            </div>
-            <div className="p-4">
-              <p className="text-xs text-gray-400 mb-0.5">{food.seller}</p>
-              <h3 className="text-base font-bold text-gray-800 mb-2">
-                {food.name}
-              </h3>
-              <div className="flex items-center gap-2 mb-2">
-                <p className="text-green-600 font-bold text-lg">
-                  Rp{Number(food.surplus_price).toLocaleString("id-ID")}
-                </p>
-                <p className="line-through text-gray-400 text-sm font-medium">
-                  Rp{Number(food.original_price).toLocaleString("id-ID")}
-                </p>
-              </div>
-              <button
-                onClick={() => onOrder(food.id)}
-                className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${added[food.id] ? "bg-green-100 text-green-700" : "bg-green-600 text-white"}`}
-              >
-                {added[food.id] ? "✓ Ditambahkan!" : "Pesan Sekarang"}
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
+    </div>
   );
 }
-
-// (Catatan: OrdersSection dan PartnerSection tetap sama seperti kodemu sebelumnya)
-// ... [OrdersSection dan PartnerSection kamu masukkan di sini] ...
 
 /* ─── APP UTAMA ─────────────────────────────────────────── */
 export default function RePlateMVP() {
-  // HOOKS HARUS DI DALAM FUNGSI INI
+  const [view, setView] = useState("landing"); // landing, auth, dashboard
+  const [userRole, setUserRole] = useState(null); // umkm atau partner
   const [activeNav, setActiveNav] = useState("home");
-  const [cartCount, setCartCount] = useState(0);
-  const [added, setAdded] = useState({});
   const [foods, setFoods] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+
+  const handleAuth = async (formData, isRegister, role) => {
+    const endpoint = isRegister ? "/api/register" : "/api/login";
+
+    try {
+      const response = await fetch(`http://localhost:8000${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // Kirim data lengkap termasuk name dan shop_name untuk DB
+        body: JSON.stringify({
+          ...formData,
+          role: role,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("replate_token", data.access_token); //
+        setUserRole(data.user.role); //
+        setView("dashboard");
+      } else {
+        alert(data.message || "Gagal Autentikasi");
+      }
+    } catch (error) {
+      console.error("Koneksi gagal:", error);
+      alert("Pastikan server Laravel sudah menyala!");
+    }
+  };
 
   useEffect(() => {
     fetch("http://localhost:8000/api/foods")
-      .then((response) => response.json())
+      .then((res) => res.json())
       .then((data) => {
         setFoods(data);
         setLoading(false);
       })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setLoading(false);
-      });
+      .catch(() => setLoading(false));
   }, []);
 
-  const handleOrder = (id) => {
-    setAdded((prev) => ({ ...prev, [id]: true }));
-    setCartCount((c) => c + 1);
-    setTimeout(() => setAdded((prev) => ({ ...prev, [id]: false })), 1500);
-  };
+  // TAMPILAN: LANDING PAGE
+  if (view === "landing")
+    return <LandingPage onLoginClick={() => setView("auth")} />;
 
-  const navItems = [
-    { id: "home", icon: "🏠", label: "Beranda" },
-    { id: "orders", icon: "📦", label: "Pesanan" },
-    { id: "partner", icon: "🤝", label: "Partner" },
-  ];
+  // TAMPILAN: LOGIN/REGISTER
+  if (view === "auth")
+    return (
+      <AuthSection
+        onAuthSubmit={handleAuth}
+        onBack={() => setView("landing")}
+      />
+    );
 
+  // TAMPILAN: DASHBOARD (SETELAH LOGIN)
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-4xl mx-auto px-5 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center">
-              <span className="text-white text-lg">♻</span>
-            </div>
-            <h1 className="text-xl font-bold text-green-700">Re-Plate</h1>
-          </div>
-          <button className="relative w-9 h-9 bg-green-50 rounded-xl flex items-center justify-center">
-            <span className="text-lg">🛒</span>
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-600 text-white text-[10px] rounded-full flex items-center justify-center">
-                {cartCount}
-              </span>
-            )}
+    <div className="min-h-screen bg-[#FDFDFD] flex flex-col">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <h1 className="text-2xl font-black text-green-700">
+            Re-Plate{" "}
+            <span className="text-[10px] bg-gray-100 px-2 py-1 rounded-lg text-gray-500 ml-2 uppercase">
+              {userRole}
+            </span>
+          </h1>
+          <button
+            onClick={() => setView("landing")}
+            className="text-gray-400 font-bold hover:text-red-500 transition-colors"
+          >
+            Keluar 🚪
           </button>
         </div>
       </header>
 
-      <main className="max-w-4xl w-full mx-auto px-5 pt-6 pb-24 flex-1">
-        {/* PERHATIKAN: Sekarang props foods dan loading dikirimkan ke HomeSection */}
-        {activeNav === "home" && (
+      <main className="max-w-7xl mx-auto w-full px-8 pt-10 pb-32 flex-1">
+        {userRole === "umkm" ? (
           <HomeSection
             foods={foods}
-            onOrder={handleOrder}
-            added={added}
             loading={loading}
+            onViewDetail={setSelectedFood}
           />
+        ) : (
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <h2 className="text-2xl font-black mb-4">Manajemen Stok Toko</h2>
+            <button className="bg-green-600 text-white px-6 py-3 rounded-2xl font-bold mb-6">
+              + Tambah Makanan Surplus
+            </button>
+          </div>
         )}
-        {/* Render section lain jika diperlukan */}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-6 py-3 flex justify-around md:hidden">
-        {navItems.map((n) => (
+      {/* Navigasi Dashboard melayang di bawah */}
+      <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 rounded-[2.5rem] p-4 flex gap-12 shadow-2xl z-50">
+        <button
+          onClick={() => setActiveNav("home")}
+          className={`flex flex-col items-center ${activeNav === "home" ? "text-green-400" : "text-gray-500"}`}
+        >
+          <span className="text-xl">🏠</span>
+          <span className="text-[9px] font-bold mt-1 uppercase">Home</span>
+        </button>
+        {userRole === "partner" && (
           <button
-            key={n.id}
-            onClick={() => setActiveNav(n.id)}
-            className={`flex flex-col items-center gap-0.5 ${activeNav === n.id ? "text-green-600" : "text-gray-400"}`}
+            onClick={() => setActiveNav("inventory")}
+            className={`flex flex-col items-center ${activeNav === "inventory" ? "text-green-400" : "text-gray-500"}`}
           >
-            <span className="text-xl">{n.icon}</span>
-            <span className="text-[10px] font-medium">{n.label}</span>
+            <span className="text-xl">📦</span>
+            <span className="text-[9px] font-bold mt-1 uppercase">
+              Stok Saya
+            </span>
           </button>
-        ))}
+        )}
       </nav>
     </div>
   );
