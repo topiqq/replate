@@ -153,6 +153,78 @@ function AuthSection({ onAuthSubmit, onBack }) {
   );
 }
 
+function AdminDashboard({ user }) {
+  return (
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="max-w-6xl mx-auto">
+        <header className="mb-8">
+          <h1 className="text-3xl font-black text-gray-900">Portal Admin Re-Plate</h1>
+          <p className="text-gray-500">Halo, {user.name}. Anda masuk sebagai Administrator.</p>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+            <span className="text-sm font-bold text-gray-400 uppercase">Total UMKM</span>
+            <p className="text-4xl font-black text-green-600">24</p>
+          </div>
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+            <span className="text-sm font-bold text-gray-400 uppercase">Pesanan Aktif</span>
+            <p className="text-4xl font-black text-green-600">156</p>
+          </div>
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+            <span className="text-sm font-bold text-gray-400 uppercase">Laporan Surplus</span>
+            <p className="text-4xl font-black text-green-600">1.2 Ton</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+          <h2 className="text-xl font-bold mb-4">Manajemen Sistem</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <button className="p-4 bg-green-50 text-green-700 rounded-2xl font-bold hover:bg-green-100 transition">Verifikasi Mitra Baru</button>
+            <button className="p-4 bg-gray-50 text-gray-700 rounded-2xl font-bold hover:bg-green-100 transition">Log Aktivitas Sistem</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+function UserDashboard({ user }) {
+  return (
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="max-w-6xl mx-auto">
+        <header className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-2xl font-black text-gray-900">
+              Halo, {user.shop_name || user.name}! 🍱
+            </h1>
+            <p className="text-gray-500">
+              Panel Kendali {user.role === 'partner' ? 'Restoran' : 'UMKM'}
+            </p>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Box Kiri: Berdasarkan Role */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+            <h3 className="font-bold text-lg mb-4">
+              {user.role === 'partner' ? 'Donasi Makanan Baru' : 'Cari Makanan Tersedia'}
+            </h3>
+            <button className="w-full py-4 bg-green-600 text-white rounded-xl font-bold">
+              {user.role === 'partner' ? '+ Tambah Surplus' : 'Lihat Katalog'}
+            </button>
+          </div>
+
+          {/* Box Kanan: Riwayat */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+            <h3 className="font-bold text-lg mb-4">Pesanan Aktif</h3>
+            <p className="text-gray-400 italic">Belum ada aktivitas saat ini.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── APP UTAMA ─────────────────────────────────────────── */
 export default function RePlateMVP() {
   const [view, setView] = useState("landing"); // landing, auth, dashboard
@@ -168,26 +240,32 @@ export default function RePlateMVP() {
     try {
       const response = await fetch(`http://localhost:8000${endpoint}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // Kirim data lengkap termasuk name dan shop_name untuk DB
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        // Pastikan semua key ini ada dan dipisahkan koma
         body: JSON.stringify({
-          ...formData,
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
           role: role,
+          shop_name: formData.shop_name, // Tambahkan ini dengan teliti
         }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("replate_token", data.access_token); //
-        setUserRole(data.user.role); //
+        localStorage.setItem("replate_token", data.access_token);
+        setUser(data.user);
+        setUserRole(data.user.role);
         setView("dashboard");
       } else {
         alert(data.message || "Gagal Autentikasi");
       }
     } catch (error) {
       console.error("Koneksi gagal:", error);
-      alert("Pastikan server Laravel sudah menyala!");
     }
   };
 
@@ -222,7 +300,7 @@ export default function RePlateMVP() {
           <h1 className="text-2xl font-black text-green-700">
             Re-Plate{" "}
             <span className="text-[10px] bg-gray-100 px-2 py-1 rounded-lg text-gray-500 ml-2 uppercase">
-              {userRole}
+              {user?.role ?? '-'}
             </span>
           </h1>
           <button
@@ -234,20 +312,15 @@ export default function RePlateMVP() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto w-full px-8 pt-10 pb-32 flex-1">
-        {userRole === "umkm" ? (
-          <HomeSection
-            foods={foods}
-            loading={loading}
-            onViewDetail={setSelectedFood}
-          />
-        ) : (
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-            <h2 className="text-2xl font-black mb-4">Manajemen Stok Toko</h2>
-            <button className="bg-green-600 text-white px-6 py-3 rounded-2xl font-bold mb-6">
-              + Tambah Makanan Surplus
-            </button>
-          </div>
+      <main className="flex-1">
+        {view === "dashboard" && (
+          <>
+            {user?.role === "admin" ? (
+              <AdminDashboard user={user} />
+            ) : (
+              <UserDashboard user={user} />
+            )}
+          </>
         )}
       </main>
 
