@@ -61,20 +61,22 @@ export default function LoginPage({ onLogin }) {
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div
             style={{
-              width: 44,
-              height: 44,
+              width: 100,
+              height: 100,
               borderRadius: 12,
               background: C.green,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: 20,
-              margin: "0 auto 12px",
+              margin: "auto",
+              overflow: "hidden", // Memastikan gambar tetap di dalam border radius
             }}
           >
-            R
+            <img
+              src="/REPLATE LOGO.png"
+              alt="Replate Logo"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
           </div>
           <h1
             style={{
@@ -87,7 +89,7 @@ export default function LoginPage({ onLogin }) {
             Re-Plate
           </h1>
           <p style={{ fontSize: 13, color: C.textMuted, marginTop: 4 }}>
-            Masuk ke akun Partner atau Admin kamu
+            Masuk ke akun kamu
           </p>
         </div>
 
