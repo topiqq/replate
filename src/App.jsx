@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { authApi } from "./services/api";
 import PartnerDashboard from "./components/partner/PartnerDashboard";
+import BuyerDashboard from "./components/buyer/BuyerDashboard";
+import AdminDashboard from "./components/admin/AdminDashboard";
 import LoginPage from "./components/LoginPage";
 import LandingPage from "./components/LandingPage";
 
@@ -88,11 +90,16 @@ export default function App() {
   }
 
   // ── Routing berdasarkan role ──
-  // Saat ini hanya role "partner" dan "admin" → PartnerDashboard
-  // Tambahkan UMKMDashboard di sini nanti:
-  //   if (user.role === "umkm") return <UMKMDashboard user={user} onLogout={handleLogout} />;
-  if (user.role === "partner" || user.role === "admin") {
+  if (user.role === "partner") {
     return <PartnerDashboard user={user} onLogout={handleLogout} />;
+  }
+
+  if (user.role === "buyer") {
+    return <BuyerDashboard user={user} onLogout={handleLogout} />;
+  }
+
+  if (user.role === "admin") {
+    return <AdminDashboard user={user} onLogout={handleLogout} />;
   }
 
   // Fallback: role tidak dikenal
