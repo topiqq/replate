@@ -79,7 +79,12 @@ export default function App() {
     if (!showLogin) {
       return <LandingPage onGetStarted={() => setShowLogin(true)} />;
     }
-    return <LoginPage onLogin={handleLogin} />;
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        onBack={() => setShowLogin(false)}
+      />
+    );
   }
 
   // ── Routing berdasarkan role ──
