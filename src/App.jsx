@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { authApi } from "./services/api";
 import PartnerDashboard from "./components/partner/PartnerDashboard";
 import LoginPage from "./components/LoginPage";
+import LandingPage from "./components/LandingPage";
 
 export default function App() {
   // user = null  → belum login
   // user = {...} → sudah login, role tersedia
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true); // cek token saat mount
+  const [showLogin, setShowLogin] = useState(false); // kontrol tampilan landing vs login
 
   // ── Cek token yang tersimpan saat app pertama load ──
   useEffect(() => {
@@ -72,8 +74,11 @@ export default function App() {
     );
   }
 
-  // ── Belum login → tampilkan halaman login ──
+  // ── Belum login → tampilkan landing page atau login page ──
   if (!user) {
+    if (!showLogin) {
+      return <LandingPage onGetStarted={() => setShowLogin(true)} />;
+    }
     return <LoginPage onLogin={handleLogin} />;
   }
 
